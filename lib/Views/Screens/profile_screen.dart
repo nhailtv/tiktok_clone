@@ -5,6 +5,8 @@ import 'package:get/instance_manager.dart';
 import 'package:tiktok_tutorial/constants.dart';
 import 'package:tiktok_tutorial/controllers/profile_controller.dart';
 
+
+
 class ProfileScreen extends StatefulWidget {
   final String uid;
   const ProfileScreen({
@@ -36,6 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           }
           return Scaffold(
+            backgroundColor: Colors.black,
             appBar: AppBar(
               backgroundColor: Colors.black12,
               leading: const Icon(
@@ -193,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(
                             height: 25,
                           ),
-                          // video list
+// video list
                           GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),

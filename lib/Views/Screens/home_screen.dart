@@ -15,6 +15,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDarkMode ? Colors.black : Colors.white;
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         onTap: (idx) {
@@ -41,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.message, size: 30),
-            label: 'Messages',
+            icon: Icon(Icons.adb, size: 30),
+            label: 'Building...',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person, size: 30),

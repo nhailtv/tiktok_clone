@@ -14,8 +14,9 @@ class SearchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.black,
           title: TextFormField(
             decoration: const InputDecoration(
                 filled: false,
@@ -30,7 +31,7 @@ class SearchScreen extends StatelessWidget {
                   'Search for users!',
                   style: TextStyle(
                       fontSize: 25,
-                      color: Colors.white,
+                      color: Colors.black,
                       fontWeight: FontWeight.bold),
                 ),
               )
@@ -54,7 +55,7 @@ class SearchScreen extends StatelessWidget {
                         user.name,
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                     ),

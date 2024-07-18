@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:tiktok_tutorial/Models/video.dart';
 import 'package:tiktok_tutorial/constants.dart';
 
+
 class VideoController extends GetxController {
   final Rx<List<Video>> _videoList = Rx<List<Video>>([]);
 
@@ -50,9 +51,20 @@ class VideoController extends GetxController {
       }
     } catch (e) {
       print('Error liking video: $e');
+      Get.snackbar('Failed to like video', 'Failed to like video. Please try again.');
+    }
+  }
 
-        Get.snackbar('failed to like video','Failed to like video. Please try again.');
-
+  Future<void> deleteVideo(String id) async {
+    try {
+      DocumentSnapshot doc = await firestore.collection('videos').doc(id).get();
+      var uid = authController.user.uid;
+      var videoOwner = (doc.data()! as dynamic)['owner'];
+        await firestore.collection('videos').doc(id).delete();
+        Get.snackbar('Success', 'Video deleted successfully');
+    } catch (e) {
+      print('Error deleting video: $e');
+      Get.snackbar('Failed to delete video', 'Failed to delete video. Please try again.');
     }
   }
 }

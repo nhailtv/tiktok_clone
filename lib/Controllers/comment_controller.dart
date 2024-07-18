@@ -78,6 +78,55 @@ class CommentController extends GetxController {
     }
   }
 
+  deleteComment(String id) async {
+    try {
+      DocumentSnapshot commentDoc = await firestore
+          .collection('videos')
+          .doc(_postId)
+          .collection('comments')
+          .doc(id)
+          .get();
+
+      if (commentDoc.exists) {
+        String commentOwnerId = (commentDoc.data()! as dynamic)['uid'];
+        if (commentOwnerId == authController.user.uid) {
+          await firestore
+              .collection('videos')
+              .doc(_postId)
+              .collection('comments')
+              .doc(id)
+              .delete();
+
+          // Update comment count
+          DocumentSnapshot doc =
+          await firestore.collection('videos').doc(_postId).get();
+          int currentCount = (doc.data()! as dynamic)['commentCount'];
+          if (currentCount > 0) {
+            await firestore.collection('videos').doc(_postId).update({
+              'commentCount': currentCount - 1,
+            });
+          }
+        } else {
+          Get.snackbar(
+            'Error',
+            'You can only delete your own comments',
+          );
+        }
+      } else {
+        Get.snackbar(
+          'Error',
+          'Comment not found',
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error While Deleting Comment',
+        e.toString(),
+      );
+    }
+  }
+
+
   likeComment(String id) async {
     var uid = authController.user.uid;
     DocumentSnapshot doc = await firestore

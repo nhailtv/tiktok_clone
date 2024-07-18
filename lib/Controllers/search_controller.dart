@@ -8,17 +8,19 @@ class TSearchController extends GetxController {
 
   List<User> get searchedUsers => _searchedUsers.value;
 
-  searchUser(String typedUser) async {
-    _searchedUsers.bindStream(firestore
-        .collection('users')
-        .where('name', isGreaterThanOrEqualTo: typedUser)
-        .snapshots()
-        .map((QuerySnapshot query) {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  void searchUser(String typedUser) {
+    firestore.collection('users').get().then((QuerySnapshot querySnapshot) {
       List<User> retVal = [];
-      for (var elem in query.docs) {
-        retVal.add(User.fromSnap(elem));
-      }
-      return retVal;
-    }));
+      querySnapshot.docs.forEach((DocumentSnapshot doc) {
+        retVal.add(User.fromSnap(doc));
+      });
+      // Filter retVal by typedUser
+      List<User> filteredUsers = retVal.where((user) =>
+          user.name.toLowerCase().contains(typedUser.toLowerCase())).toList();
+
+      _searchedUsers.value = filteredUsers;
+    });
   }
 }

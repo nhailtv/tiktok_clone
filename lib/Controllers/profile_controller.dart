@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:tiktok_tutorial/Controllers/auth_controller.dart';
 import 'package:tiktok_tutorial/constants.dart';
 
 class ProfileController extends GetxController {
@@ -8,6 +9,9 @@ class ProfileController extends GetxController {
 
   Rx<String> _uid = "".obs;
 
+  // Initialize authController for access to user authentication details
+  final authController = Get.find<AuthController>();
+
   updateUserId(String uid) {
     _uid.value = uid;
     getUserData();
@@ -15,7 +19,7 @@ class ProfileController extends GetxController {
 
   getUserData() async {
     List<String> thumbnails = [];
-    var myVideos = await firestore
+    var myVideos = await FirebaseFirestore.instance
         .collection('videos')
         .where('uid', isEqualTo: _uid.value)
         .get();
@@ -25,7 +29,7 @@ class ProfileController extends GetxController {
     }
 
     DocumentSnapshot userDoc =
-    await firestore.collection('users').doc(_uid.value).get();
+    await FirebaseFirestore.instance.collection('users').doc(_uid.value).get();
     final userData = userDoc.data()! as dynamic;
     String name = userData['name'];
     String profilePhoto = userData['profilePhoto'];
@@ -37,12 +41,12 @@ class ProfileController extends GetxController {
     for (var item in myVideos.docs) {
       likes += (item.data()['likes'] as List).length;
     }
-    var followerDoc = await firestore
+    var followerDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(_uid.value)
         .collection('followers')
         .get();
-    var followingDoc = await firestore
+    var followingDoc = await FirebaseFirestore.instance
         .collection('users')
         .doc(_uid.value)
         .collection('following')
@@ -50,18 +54,15 @@ class ProfileController extends GetxController {
     followers = followerDoc.docs.length;
     following = followingDoc.docs.length;
 
-    firestore
+    // Check if current user is following this profile user
+    FirebaseFirestore.instance
         .collection('users')
         .doc(_uid.value)
         .collection('followers')
         .doc(authController.user.uid)
         .get()
         .then((value) {
-      if (value.exists) {
-        isFollowing = true;
-      } else {
-        isFollowing = false;
-      }
+      isFollowing = value.exists;
     });
 
     _user.value = {
@@ -77,7 +78,7 @@ class ProfileController extends GetxController {
   }
 
   followUser() async {
-    var doc = await firestore
+    var doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(_uid.value)
         .collection('followers')
@@ -85,13 +86,13 @@ class ProfileController extends GetxController {
         .get();
 
     if (!doc.exists) {
-      await firestore
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(_uid.value)
           .collection('followers')
           .doc(authController.user.uid)
           .set({});
-      await firestore
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(authController.user.uid)
           .collection('following')
@@ -102,13 +103,13 @@ class ProfileController extends GetxController {
             (value) => (int.parse(value) + 1).toString(),
       );
     } else {
-      await firestore
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(_uid.value)
           .collection('followers')
           .doc(authController.user.uid)
           .delete();
-      await firestore
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(authController.user.uid)
           .collection('following')
@@ -121,5 +122,24 @@ class ProfileController extends GetxController {
     }
     _user.value.update('isFollowing', (value) => !value);
     update();
+  }
+
+  Future<void> deleteVideo(String id) async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('videos').doc(id).get();
+      var uid = authController.user.uid;
+      var videoOwner = (doc.data()! as dynamic)['uid'];
+
+      // Check if the video belongs to the current user
+      if (videoOwner == uid) {
+        await FirebaseFirestore.instance.collection('videos').doc(id).delete();
+        Get.snackbar('Success', 'Video deleted successfully');
+      } else {
+        Get.snackbar('Unauthorized', 'You are not authorized to delete this video.');
+      }
+    } catch (e) {
+      print('Error deleting video: $e');
+      Get.snackbar('Failed to delete video', 'Failed to delete video. Please try again.');
+    }
   }
 }

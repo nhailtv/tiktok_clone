@@ -5,7 +5,9 @@
   import 'package:firebase_auth/firebase_auth.dart';
   import 'package:firebase_storage/firebase_storage.dart';
   import 'package:flutter/material.dart';
+  import 'package:flutter/scheduler.dart';
   import 'package:tiktok_tutorial/Views/Screens/add_video_screen.dart';
+
   import 'package:tiktok_tutorial/Views/Screens/profile_screen.dart';
   import 'package:tiktok_tutorial/Views/Screens/search_screen.dart';
   import 'Controllers/auth_controller.dart';
@@ -20,18 +22,19 @@
     VideoScreen(),
     SearchScreen(),
     const AddVideoScreen(),
-    Text('4th Screen'),
+    const Text("Building..."),
     ProfileScreen(uid: authController.user.uid),
-    // Text('Messages Screen'),
-    // ProfileScreen(uid: authController.user.uid),
-
-
-
   ];
   // COLORS
-  const backgroundColor = Colors.black;
-  var buttonColor = Colors.blueAccent[400];
-  const borderColor = Colors.grey;
+
+  // var brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+  // bool isDarkMode = brightness == Brightness.dark;
+  // var backgroundColor = isDarkMode ? Colors.black : Colors.white;
+
+
+
+  // var buttonColor = Colors.greenAccent[400];
+  const borderColor = Colors.black;
 
 
 

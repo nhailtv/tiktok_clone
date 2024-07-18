@@ -1,10 +1,21 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tiktok_tutorial/constants.dart';
 
 import 'confirm_screen.dart';
+
+class ThemeController extends GetxController {
+  RxBool isDarkMode = (SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark).obs;
+
+  void updateTheme() {
+    isDarkMode.value = SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  }
+}
+
 
 class AddVideoScreen extends StatelessWidget {
   const AddVideoScreen({super.key});
@@ -89,7 +100,7 @@ class AddVideoScreen extends StatelessWidget {
             width: 190,
             height: 50,
             decoration: BoxDecoration(
-              color: buttonColor,
+              color: Colors.blueAccent[400],
             ),
             child: const Center(
               child: Text(

@@ -1,11 +1,15 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart'; // Import this for Colors and EdgeInsets
 import 'package:get/get.dart';
 import 'package:tiktok_tutorial/constants.dart';
 import 'package:tiktok_tutorial/models/video.dart';
 import 'package:video_compress/video_compress.dart';
 
 class UploadVideoController extends GetxController {
+  static const int maxFileSizeMB = 75;
+
   _compressVideo(String videoPath) async {
     final compressedVideo = await VideoCompress.compressVideo(
       videoPath,
@@ -15,9 +19,25 @@ class UploadVideoController extends GetxController {
   }
 
   Future<String> _uploadVideoToStorage(String id, String videoPath) async {
-    Reference ref = firebaseStorage.ref().child('videos').child(id);
+    File compressedFile = await _compressVideo(videoPath);
 
-    UploadTask uploadTask = ref.putFile(await _compressVideo(videoPath));
+    // Check file size
+    if (compressedFile.lengthSync() > maxFileSizeMB * 1024 * 1024) {
+      Get.snackbar(
+        'Error Uploading Video',
+        'Video size exceeds ${maxFileSizeMB}MB. Please upload a smaller video.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        borderRadius: 10,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+      );
+      throw Exception('File size exceeds ${maxFileSizeMB}MB');
+    }
+
+    Reference ref = firebaseStorage.ref().child('videos').child(id);
+    UploadTask uploadTask = ref.putFile(compressedFile);
     TaskSnapshot snap = await uploadTask;
     String downloadUrl = await snap.ref.getDownloadURL();
     return downloadUrl;
@@ -70,6 +90,12 @@ class UploadVideoController extends GetxController {
       Get.snackbar(
         'Error Uploading Video',
         e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        borderRadius: 10,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
       );
     }
   }

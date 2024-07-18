@@ -19,7 +19,6 @@ class AuthController extends GetxController {
 
   User get user => _user.value!;
 
-
   @override
   void onReady() {
     super.onReady();
@@ -28,50 +27,35 @@ class AuthController extends GetxController {
     ever(_user, _setInitialScreen);
   }
 
-  _setInitialScreen(User? user) {
+  void _setInitialScreen(User? user) {
+    print("Auth state changed. Current user: $user");
     if (user == null) {
       Get.offAll(() => LoginScreen());
     } else {
-      Get.offAll(() => const HomeScreen());
+      Get.offAll(() => HomeScreen());
     }
   }
-
 
   void pickImage() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
-      Get.snackbar('Profile Picture',
-          'You have successfully selected your profile picture!');
+      Get.snackbar('Profile Picture', 'You have successfully selected your profile picture!');
+      _pickedImage.value = File(pickedImage.path);
     }
-    _pickedImage = Rx<File?>(File(pickedImage!.path));
   }
 
-  //upload to firebase
   Future<String> _uploadToStorage(File image) async {
-    Reference ref = firebaseStorage
-        .ref()
-        .child('profilePics')
-        .child(firebaseAuth.currentUser!.uid);
-
+    Reference ref = firebaseStorage.ref().child('profilePics').child(firebaseAuth.currentUser!.uid);
     UploadTask uploadTask = ref.putFile(image);
     TaskSnapshot snap = await uploadTask;
     String downloadUrl = await snap.ref.getDownloadURL();
     return downloadUrl;
   }
 
-  void registerUser(
-      String username, String email, String password, File? image) async {
+  void registerUser(String? username, String? email, String? password, File? image) async {
     try {
-      if (username.isNotEmpty &&
-          email.isNotEmpty &&
-          password.isNotEmpty &&
-          image != null) {
-        // save out user to our ath and firebase firestore
-        UserCredential cred = await firebaseAuth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+      if (username != null && email != null && password != null && image != null) {
+        UserCredential cred = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
         String downloadUrl = await _uploadToStorage(image);
         model.User user = model.User(
           name: username,
@@ -79,26 +63,10 @@ class AuthController extends GetxController {
           uid: cred.user!.uid,
           profilePhoto: downloadUrl,
         );
-        await firestore
-            .collection('users')
-            .doc(cred.user!.uid)
-            .set(user.toJson());
-        Get.snackbar(
-          "Thành công!",
-          "Tạo tài khoản thành công!!",
-          backgroundColor: Colors.green, // Set your desired background color
-        );
+        await firestore.collection('users').doc(cred.user!.uid).set(user.toJson());
+        Get.snackbar("Thành công!", "Tạo tài khoản thành công!", backgroundColor: Colors.green);
       } else {
-        Get.snackbar(
-          'Lỗi tạo tài khoản',
-          'Vui lòng nhập đầy đủ thông tin',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          borderRadius: 10,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
-        );
+        Get.snackbar('Lỗi tạo tài khoản', 'Vui lòng nhập đầy đủ thông tin', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white, borderRadius: 10, margin: EdgeInsets.all(10), duration: Duration(seconds: 3));
       }
     } catch (e) {
       String errorMessage;
@@ -107,20 +75,9 @@ class AuthController extends GetxController {
       } else {
         errorMessage = 'Đã xảy ra lỗi, vui lòng thử lại.';
       }
-
-      Get.snackbar(
-        'Lỗi tạo tài khoản',
-        errorMessage,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        borderRadius: 10,
-        margin: EdgeInsets.all(10),
-        duration: Duration(seconds: 3),
-      );
+      Get.snackbar('Lỗi tạo tài khoản', errorMessage, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white, borderRadius: 10, margin: EdgeInsets.all(10), duration: Duration(seconds: 3));
     }
   }
-
 
   String getMessageFromErrorCode(String errorCode) {
     switch (errorCode) {
@@ -154,20 +111,10 @@ class AuthController extends GetxController {
   void loginUser(String email, String password) async {
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: email, password: password);
+        await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
         print('Đăng nhập thành công');
       } else {
-        Get.snackbar(
-          'Lỗi đăng nhập',
-          'Vui lòng nhập đầy đủ thông tin',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          borderRadius: 10,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
-        );
+        Get.snackbar('Lỗi đăng nhập', 'Vui lòng nhập đầy đủ thông tin', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white, borderRadius: 10, margin: EdgeInsets.all(10), duration: Duration(seconds: 3));
       }
     } catch (e) {
       String errorMessage;
@@ -176,21 +123,13 @@ class AuthController extends GetxController {
       } else {
         errorMessage = 'Đã xảy ra lỗi, vui lòng thử lại.';
       }
-
-      Get.snackbar(
-        'Lỗi đăng nhập',
-        errorMessage,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        borderRadius: 10,
-        margin: EdgeInsets.all(10),
-        duration: Duration(seconds: 3),
-      );
+      Get.snackbar('Lỗi đăng nhập', errorMessage, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white, borderRadius: 10, margin: EdgeInsets.all(10), duration: Duration(seconds: 3));
     }
   }
 
   void signOut() async {
     await firebaseAuth.signOut();
   }
+
+
 }
