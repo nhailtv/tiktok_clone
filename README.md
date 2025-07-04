@@ -1,16 +1,58 @@
-# tiktok_tutorial
+# TikTok Clone
 
-A new Flutter project.
+A cross-platform TikTok clone built with Flutter and Firebase.
+
+## Features
+
+- User authentication (sign up, login, logout)
+- Video upload and playback
+- Like, comment, and share videos
+- User profiles
+- Search functionality
+- Responsive UI for mobile and web
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
+- [Flutter](https://flutter.dev/docs/get-started/install)
+- [Firebase CLI](https://firebase.google.com/docs/cli)
+- Android Studio or Xcode (for mobile development)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Installation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/nhailtv/tiktok_clone.git
+   cd tiktok_clone
+   ```
+
+2. **Install dependencies:**
+   ```sh
+   flutter pub get
+   ```
+
+3. **Configure Firebase:**
+   - Add your `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) to the respective directories.
+   - Update `firebase_options.dart` if needed.
+
+4. **Run the app:**
+   ```sh
+   flutter run
+   ```
+
+## Project Structure
+
+- `lib/` - Main source code
+  - `Controllers/` - State management and business logic
+  - `Models/` - Data models
+  - `Views/` - UI screens and widgets
+- `android/`, `ios/`, `web/`, `linux/`, `macos/`, `windows/` - Platform-specific code
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+[MIT](LICENSE)
